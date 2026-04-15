@@ -242,6 +242,7 @@ if (BUILD_LLVM_UTILS OR BUILD_TV)
   add_llvm_executable(backend-tv
     "tools/backend-tv.cpp"
   )
+  target_compile_options(backend-tv PRIVATE -fexceptions)
 
   add_llvm_executable(quick-fuzz
     "tools/quick-fuzz.cpp"

@@ -1,10 +1,18 @@
 #pragma once
 
+#include <array>
+#include <cstdint>
+
 #include <llvm/MC/MCExpr.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/IR/Instructions.h>
 
 namespace aslp {
+
+// an opcode for ASLP is four bytes (= 32 bits), in Arm's conventional
+// little-endian order.  Defined here (rather than in aslp_bridge.h) so
+// that non-ASLP builds can still reference the type.
+using opcode_t = std::array<uint8_t, 4>;
 
 enum struct pstate_t : uint64_t {
   N = 0, Z, C, V
