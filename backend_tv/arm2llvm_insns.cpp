@@ -2,7 +2,9 @@
 
 #include "Target/AArch64/MCTargetDesc/AArch64MCAsmInfo.h"
 
+#ifdef USE_ASLP
 #include "aslp/aslp_bridge.h"
+#endif
 
 using namespace std;
 using namespace lifter;
@@ -10,10 +12,12 @@ using namespace llvm;
 
 void arm2llvm::lift(MCInst &I) {
   auto entrybb = LLVMBB;
-  aslp::bridge bridge{*this, *MCE.get(), *STI.get(), *IA.get()};
+  (void)entrybb;
   auto opcode = I.getOpcode();
 
   StringRef instStr = InstPrinter->getOpcodeName(I.getOpcode());
+#ifdef USE_ASLP
+  aslp::bridge bridge{*this, *MCE.get(), *STI.get(), *IA.get()};
   if (auto a64Opcode = getArmOpcode(I)) {
     auto aslpResult = bridge.run(I, a64Opcode.value());
 
@@ -52,6 +56,10 @@ void arm2llvm::lift(MCInst &I) {
     }
   } else {
     *out << "... arm opnum failed: " << instStr.str() << '\n';
+#else
+  {
+    // ASLP disabled; always fall through to classic switch-based dispatch.
+#endif
     // arm opcode translation failed, possibly SentinelNOP. continue with
     // classic.
   }

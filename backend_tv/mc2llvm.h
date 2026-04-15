@@ -9,9 +9,16 @@
 #include "llvm/IR/Value.h"
 #include "llvm/IR/ValueHandle.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/MC/MCAsmInfo.h"
+#include "llvm/MC/MCCodeEmitter.h"
 #include "llvm/MC/MCContext.h"
 #include "llvm/MC/MCInstPrinter.h"
+#include "llvm/MC/MCInstrAnalysis.h"
+#include "llvm/MC/MCInstrInfo.h"
+#include "llvm/MC/MCRegisterInfo.h"
+#include "llvm/MC/MCSubtargetInfo.h"
+#include "llvm/Support/MemoryBuffer.h"
 #include "llvm/MC/MCParser/MCTargetAsmParser.h"
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/MC/MCTargetOptions.h"
@@ -24,7 +31,10 @@
 #include "backend_tv/lifter.h"
 #include "backend_tv/streamerwrapper.h"
 
+#include "aslp/interface.h"
+#ifdef USE_ASLP
 #include "aslp/aslp_bridge.h"
+#endif
 
 namespace lifter {
 
@@ -328,7 +338,7 @@ public:
   }
 
   void createBranch(llvm::Value *c, llvm::BasicBlock *t, llvm::BasicBlock *f) {
-    llvm::BranchInst::Create(t, f, c, LLVMBB);
+    llvm::CondBrInst::Create(t, f, c, LLVMBB);
   }
 
   void createBranch(llvm::Value *c, stmt_t t, stmt_t f) override {
@@ -336,7 +346,7 @@ public:
   }
 
   void createBranch(llvm::BasicBlock *dst) {
-    llvm::BranchInst::Create(dst, LLVMBB);
+    llvm::UncondBrInst::Create(dst, LLVMBB);
   }
 
   void createBranch(stmt_t dst) override {
@@ -473,7 +483,7 @@ public:
   llvm::CallInst *createConvertFromFP16(llvm::Value *v,
                                         llvm::Type *ty) override {
     auto cvt_decl = llvm::Intrinsic::getOrInsertDeclaration(
-        LiftedModule, llvm::Intrinsic::convert_from_fp16, ty);
+        LiftedModule, llvm::Intrinsic::fpext, ty);
     return llvm::CallInst::Create(cvt_decl, {v}, nextName(), LLVMBB);
   }
 

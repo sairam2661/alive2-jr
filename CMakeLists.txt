@@ -299,8 +299,9 @@ if (BUILD_LLVM_UTILS OR BUILD_TV)
   llvm_map_components_to_libnames(llvm_libs CodeGen TargetParser support core irreader bitwriter analysis passes transformutils ipo asmparser asmprinter target mc mcparser mcdisassembler aarch64asmparser aarch64codegen aarch64desc aarch64disassembler aarch64info aarch64utils riscvasmparser riscvcodegen riscvdesc riscvdisassembler riscvinfo AllTargetsCodeGens AllTargetsDescs AllTargetsInfos
     )
 
-  add_subdirectory(backend_tv/aslp)
-  target_link_libraries(backend_tv PUBLIC bridge)
+  # ASLP disabled for LLVM trunk build
+  # add_subdirectory(backend_tv/aslp)
+  # target_link_libraries(backend_tv PUBLIC bridge)
 
 #  target_link_libraries(alive2 PRIVATE ${llvm_libs})
   target_link_libraries(alive-tv PRIVATE ${ALIVE_LIBS_LLVM} ${Z3_LIBRARIES} ${HIREDIS_LIBRARIES} ${llvm_libs})
